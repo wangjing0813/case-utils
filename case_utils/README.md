@@ -1,0 +1,189 @@
+# case-utils
+Utilities for async CSV handling and data filtering
+
+## 安装依赖
+
+```bash
+# 创建并激活虚拟环境（推荐）
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 安装运行时依赖
+pip install -r requirements.txt
+
+#（可选）安装开发工具
+pip install -r dev-requirements.txt   # 或者直接使用本文件的 dev 部分
+
+
+---
+
+### 关键点回顾
+
+1. **`requirements.txt`** 必须包含 `pandas` 与 `aiofiles`（它们是 `utils.py` 里唯一的外部库）。  
+2. **版本号**：使用 `>=` 可以保持向前兼容；如果项目对确定版本有严格要求，使用 `==` 并用 `pip freeze` 锁定。  
+3. **开发依赖**（pytest、black、mypy 等）可以放在同一文件的下部或另建 `dev-requirements.txt`，根据团队工作流自行决定。  
+4. **安装**：`pip install -r requirements.txt` 是最常用的方式，配合虚拟环境可以确保全局 Python 环境不受影响。
+
+把这些内容复制进你的仓库根目录的 `requirements.txt`（或分别写到 `requirements.txt`、`dev-requirements.txt`），提交并推送即可。之后 **任何人** 只要 `git clone` 并运行上述 `pip install` 命令，就能得到完整、可运行的环境。  
+
+如果还有 **依赖冲突**、**特定版本需求**（比如你必须使用 `pandas==2.1.3`），或者想了解 **如何在 CI 中使用这些文件**，随时告诉我！祝你项目顺利 🚀.
+
+
+# ==================== Runtime ====================
+pandas>=2.0.0
+aiofiles>=23.2.0
+
+# ==================== Development ====================
+# testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+
+# formatting & linting
+black>=24.1.0
+isort>=5.13.0
+flake8>=7.0.0
+
+# type checking
+mypy>=1.8.0
+
+
+
+# .gitignore 里加入：
+data/
+*.pyc
+__pycache__/
+.venv/
+
+
+case-utils/
+│
+├─ .git/                 ← Git 元数据（已存在）
+├─ .gitignore            ← 忽略不需要提交的文件/目录
+├─ .venv/                ← 本地虚拟环境（不提交）
+├─ data/                 ← 示例 CSV（如果不想公开，可加入 .gitignore）
+│   └─ sample.csv
+├─ utils.py              ← 核心实现（read_csv_async、filter_invalid）
+├─ utils_wrapper.py      ← 同步包装函数（load_and_clean）
+├─ demo.py               ← 演示脚本（可在 README 中引用）
+├─ requirements.txt      ← 运行时依赖（已锁定 pandas、aiofiles）
+├─ README.md             ← 项目说明（已写好，可再补充示例）
+├─ LICENSE               ← 开源许可证（MIT）
+└─ 1                     ← 误生成的空文件（建议删除）
+
+
+Day2:
+1.`asyncio` 基础**（官方文档） 
+ 1️⃣ 阅读 <https://docs.python.org/3/library/asyncio.html>，熟悉 **事件循环、`async` / `await`、`asyncio.run`、`Task`、`gather`**。
+ 2️⃣ 编写小实验：并发读取多个文件、并行执行两个 `async` 函数。 | `async_demo.py`（演示 `asyncio` 基础）。 
+2.把 `filter_invalid` 改写为异步
+1️⃣ 将业务规则封装进 **`async def async_filter_invalid(df)`**（内部仍使用 Pandas 同步操作，但函数本身为 `async` 方便在更大的异步流水线中调用）。
+2️⃣ 为 **`read_csv_async` + `async_filter_invalid`** 写 **单元测试**（`pytest` + `pytest‑asyncio`）。 | `tests/test_utils.py`（包括 `asyncio` 测试）。
+
+# 1️⃣ 进入项目根目录，激活虚拟环境
+cd ~/case-utils/case-utils
+source .venv/bin/activate
+
+# 2️⃣ 安装 asyncio、pytest、pytest‑asyncio（已在 requirements 中，但确保一下）
+pip install -U pytest pytest-asyncio flake8 black isort
+
+# 3️⃣ 下面创建 async 版本的 filter
+cat > utils_async.py <<'PY'
+import pandas as pd
+from typing import Any
+import asyncio
+
+async def async_filter_invalid(df: pd.DataFrame) -> pd.DataFrame:
+    """异步包装，只是返回协程，内部仍使用同步 Pandas 检查。"""
+    # 这里不做真正的异步 I/O，只是让调用者在 async 流程中使用
+    required = {"id", "timestamp", "value"}
+    missing = required - set(df.columns)
+    if missing:
+        raise ValueError(f"Missing columns: {missing}")
+
+    # 同步的业务规则（可以放进线程池 async‑ify，但目前足够）
+    mask = (
+        pd.to_numeric(df["id"], errors="coerce").astype("Int64") > 0 &
+        pd.to_datetime(df["timestamp"], errors="coerce").notna() &
+        pd.to_numeric(df["value"], errors="coerce").between(0, 100, inclusive="both")
+    )
+    return df.loc[mask].reset_index(drop=True)
+PY
+
+# 4️⃣ 编写 pytest‑asyncio 测试
+mkdir -p tests
+cat > tests/test_utils.py <<'PY'
+import pytest, asyncio
+import pandas as pd
+from pathlib import Path
+from utils import read_csv_async
+from utils_async import async_filter_invalid
+
+@pytest.mark.asyncio
+async def test_read_and_filter(tmp_path):
+    # 创建临时 CSV
+    csv = tmp_path / "sample.csv"
+    csv.write_text(
+        "id,timestamp,value,extra\\n"
+        "1,2024-01-01 12:00:00,42,foo\\n"
+        "2,2024-01-02 08:00:00,105,bar\\n"
+        "3,invalid,23,baz\\n"
+        "4,2024-01-04 15:20:00,78,qux\\n"
+    )
+    df_raw = await read_csv_async(csv)
+    df_clean = await async_filter_invalid(df_raw)
+    assert len(df_clean) == 2
+    assert set(df_clean["id"]) == {1, 4}
+PY
+
+# 5️⃣ 运行测试确认通过
+pytest -q
+# (应看到 1 passed)
+
+# 6️⃣ 添加 GitHub Actions workflow
+mkdir -p .github/workflows
+cat > .github/workflows/ci.yml <<'EOF'
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio flake8 black isort
+
+      - name: Lint (black + isort + flake8)
+        run: |
+          source .venv/bin/activate
+          black --check .
+          isort --check-only .
+          flake8 .
+
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
+          pytest -q
+EOF
+
+# 7️⃣ 提交并推送
+git add utils_async.py tests/.github/ .github/workflows/ci.yml
+git commit -m "Add async filter, unit tests, CI workflow"
+git push origin main
+# 检查 GitHub Actions 页面，确保 lint + pytest 均通过。
