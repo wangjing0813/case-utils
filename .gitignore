@@ -210,3 +210,14 @@ data/
 *.pyc
 __pycache__/
 .venv/
+
+# ──────────────────────────────────────
+# 运行时产生的日志、缓存等
+logs/
+*.log               # 捕获 monitor.log、其他 .log 文件
+__pycache__/
+*.pyc
+
+# 虚拟环境（如果你在项目根目录创建了 .venv）
+.venv/
+env/
