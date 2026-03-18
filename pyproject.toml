@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "case-utils"
+version = "0.1.0"
+description = "Utility library for async CSV handling"
+authors = [{name = "wangjing", email = "wangjing@example.com"}]
+
+# 依賴（CI、開發、測試都會使用到的）
+dependencies = [
+    "pandas>=2.0",
+    "aiofiles>=23.2"
+]
+
+# 若你想在本機安裝開發工具，亦可在 extras 中列出
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "flake8",
+    "black",
+    "isort"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["case_utils*"]
