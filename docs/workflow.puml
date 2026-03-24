@@ -1,0 +1,14 @@
+@startuml
+title case-utils 开发工作流
+ 
+participant "开发者" as Dev
+participant "本地Git" as Local  
+participant "GitHub" as Remote
+participant "data子模块" as Data
+ 
+Dev -> Local: 修改代码
+Dev -> Data: git pull (更新数据)
+Dev -> Local: git add .
+Dev -> Local: git commit
+Dev -> Remote: git push
+@enduml
