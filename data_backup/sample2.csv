@@ -1,0 +1,5 @@
+id,timestamp,value,extra_info
+1,2024-01-10 12:34:56,42,foo
+2,2024-01-11 08:00:00,105,bar   # 这条会被 filter_invalid “value > 100” 过滤掉
+3,invalid_date,23,baz          # 日期非法，同样会被过滤
+4,2024-01-12 15:20:05,78,qux

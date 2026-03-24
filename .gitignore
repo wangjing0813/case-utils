@@ -206,10 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-data/
-*.pyc
-__pycache__/
-.venv/
 
 # ──────────────────────────────────────
 # 运行时产生的日志、缓存等
