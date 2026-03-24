@@ -15,20 +15,6 @@ pip install -r requirements.txt
 pip install -r dev-requirements.txt   # 或者直接使用本文件的 dev 部分
 
 
----
-
-### 关键点回顾
-
-1. **`requirements.txt`** 必须包含 `pandas` 与 `aiofiles`（它们是 `utils.py` 里唯一的外部库）。  
-2. **版本号**：使用 `>=` 可以保持向前兼容；如果项目对确定版本有严格要求，使用 `==` 并用 `pip freeze` 锁定。  
-3. **开发依赖**（pytest、black、mypy 等）可以放在同一文件的下部或另建 `dev-requirements.txt`，根据团队工作流自行决定。  
-4. **安装**：`pip install -r requirements.txt` 是最常用的方式，配合虚拟环境可以确保全局 Python 环境不受影响。
-
-把这些内容复制进你的仓库根目录的 `requirements.txt`（或分别写到 `requirements.txt`、`dev-requirements.txt`），提交并推送即可。之后 **任何人** 只要 `git clone` 并运行上述 `pip install` 命令，就能得到完整、可运行的环境。  
-
-如果还有 **依赖冲突**、**特定版本需求**（比如你必须使用 `pandas==2.1.3`），或者想了解 **如何在 CI 中使用这些文件**，随时告诉我！祝你项目顺利 🚀.
-
-
 # ==================== Runtime ====================
 pandas>=2.0.0
 aiofiles>=23.2.0
@@ -48,13 +34,9 @@ mypy>=1.8.0
 
 
 
-# .gitignore 里加入：
 
 
-
-
-
-
+'''
 case-utils/
 │
 ├─ .git/                 ← Git 元数据（已存在）
@@ -69,6 +51,7 @@ case-utils/
 ├─ README.md             ← 项目说明（已写好，可再补充示例）
 ├─ LICENSE               ← 开源许可证（MIT）
 └─ 1                     ← 误生成的空文件（建议删除）
+'''
  
 ## 开发工作流
  
@@ -88,25 +71,4 @@ sequenceDiagram
     本地Git->>GitHub: git push
     GitHub->>其他开发者: git clone
     其他开发者->>子模块: git submodule update --init
-data/ *.pyc pycache/ .venv/
-## 项目结构
- 
-case-utils/ ├── case_utils/ # 主要代码 │ ├── monitor.py # 监控模块 │ ├── utils.py # 实用工具 │ ├── utils_async.py # 异步工具 │ └── ... ├── data/ # 数据文件（Git子模块） ├── tests/ # 测试文件 └── docs/ # 文档
-## 开发工作流
- 
-```mermaid
-sequenceDiagram
-    title case-utils 开发工作流
-    
-    participant 开发者
-    participant 本地Git
-    participant GitHub
-    participant data子模块
-    
-    开发者->>本地Git: 修改代码
-    开发者->>data子模块: git pull
-    开发者->>本地Git: git add .
-    开发者->>本地Git: git commit
-    本地Git->>GitHub: git push
-    GitHub->>其他开发者: git clone
-    其他开发者->>子模块: git submodule update --init
+'''
