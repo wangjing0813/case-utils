@@ -1,0 +1,530 @@
+## **📊 NumPy 完全指南**
+
+---
+
+## **🔍 什么是 NumPy？**
+
+### **基本概念**
+```python
+# NumPy = Numerical Python
+# 是Python科学计算的核心库
+# 提供高性能的多维数组对象和相关工具
+
+# 为什么需要NumPy？
+# 1. Python列表慢 → NumPy数组快
+# 2. Python列表功能少 → NumPy功能丰富
+# 3. 科学计算需要 → NumPy专门设计
+```
+
+### **核心优势**
+```python
+# 1. 性能优势
+import numpy as np
+import time
+
+# Python列表
+python_list = list(range(1000000))
+start = time.time()
+result = [x * 2 for x in python_list]
+python_time = time.time() - start
+
+# NumPy数组
+numpy_array = np.arange(1000000)
+start = time.time()
+result = numpy_array * 2
+numpy_time = time.time() - start
+
+print(f"Python列表: {python_time:.4f}秒")
+print(f"NumPy数组: {numpy_time:.4f}秒")
+print(f"NumPy快 {python_time/numpy_time:.1f}倍")
+```
+
+---
+
+## **🎯 NumPy 核心概念**
+
+### **1. ndarray - 多维数组**
+```python
+import numpy as np
+
+# 创建数组
+# 1维数组
+arr1d = np.array([1, 2, 3, 4, 5])
+print("1维数组:", arr1d)
+print("形状:", arr1d.shape)  # (5,)
+print("维度:", arr1d.ndim)  # 1
+
+# 2维数组（矩阵）
+arr2d = np.array([[1, 2, 3], [4, 5, 6]])
+print("\n2维数组:")
+print(arr2d)
+print("形状:", arr2d.shape)  # (2, 3)
+print("维度:", arr2d.ndim)  # 2
+
+# 3维数组
+arr3d = np.array([[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+print("\n3维数组:")
+print(arr3d)
+print("形状:", arr3d.shape)  # (2, 2, 2)
+print("维度:", arr3d.ndim)  # 3
+```
+
+### **2. 数组属性**
+```python
+arr = np.array([[1, 2, 3, 4], [5, 6, 7, 8]])
+
+print("数组:", arr)
+print("形状 (shape):", arr.shape)        # (2, 4) - 2行4列
+print("大小 (size):", arr.size)          # 8 - 总元素个数
+print("维度 (ndim):", arr.ndim)          # 2 - 维度数量
+print("数据类型 (dtype):", arr.dtype)     # int64 - 元素类型
+print("元素大小 (itemsize):", arr.itemsize) # 8 - 每个元素字节数
+```
+
+---
+
+## **🛠️ NumPy 数组创建**
+
+### **基础创建方法**
+```python
+import numpy as np
+
+# 1. 从Python列表创建
+arr1 = np.array([1, 2, 3, 4, 5])
+arr2 = np.array([[1, 2, 3], [4, 5, 6]])
+
+# 2. 使用内置函数创建
+# 全零数组
+zeros_arr = np.zeros((3, 4))
+print("全零数组:")
+print(zeros_arr)
+
+# 全一数组
+ones_arr = np.ones((2, 3))
+print("\n全一数组:")
+print(ones_arr)
+
+# 指定数值数组
+full_arr = np.full((2, 3), 7)
+print("\n指定数值数组:")
+print(full_arr)
+
+# 单位矩阵
+eye_arr = np.eye(3)
+print("\n单位矩阵:")
+print(eye_arr)
+
+# 等差数列
+arange_arr = np.arange(0, 10, 2)  # 0到10，步长2
+print("\n等差数列:", arange_arr)
+
+# 等间隔数列
+linspace_arr = np.linspace(0, 1, 5)  # 0到1，5个点
+print("等间隔数列:", linspace_arr)
+
+# 随机数组
+random_arr = np.random.rand(2, 3)  # 2x3的[0,1)随机数
+print("\n随机数组:")
+print(random_arr)
+```
+
+### **指定数据类型**
+```python
+import numpy as np
+
+# 创建不同数据类型的数组
+int_arr = np.array([1, 2, 3], dtype=np.int32)
+float_arr = np.array([1.1, 2.2, 3.3], dtype=np.float64)
+bool_arr = np.array([True, False, True], dtype=np.bool_)
+string_arr = np.array(['hello', 'world'], dtype=np.str_)
+
+print("整数数组:", int_arr, "类型:", int_arr.dtype)
+print("浮点数组:", float_arr, "类型:", float_arr.dtype)
+print("布尔数组:", bool_arr, "类型:", bool_arr.dtype)
+print("字符串数组:", string_arr, "类型:", string_arr.dtype)
+```
+
+---
+
+## **⚡ NumPy 数组操作**
+
+### **1. 索引和切片**
+```python
+import numpy as np
+
+arr = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]])
+
+print("原数组:")
+print(arr)
+
+# 基本索引
+print("\n基本索引:")
+print("arr[0, 1]:", arr[0, 1])  # 第0行第1列 → 2
+print("arr[2]:", arr[2])        # 第2行 → [9, 10, 11, 12]
+
+# 切片
+print("\n切片操作:")
+print("arr[0:2, 1:3]:")
+print(arr[0:2, 1:3])  # 第0-1行，第1-2列
+
+print("arr[:, 2]:")    # 所有行，第2列
+print(arr[:, 2])
+
+print("arr[1, :]:")    # 第1行，所有列
+print(arr[1, :])
+
+# 布尔索引
+print("\n布尔索引:")
+mask = arr > 5
+print("mask:")
+print(mask)
+print("arr[mask]:")
+print(arr[mask])  # 所有大于5的元素
+```
+
+### **2. 数组运算**
+```python
+import numpy as np
+
+arr1 = np.array([1, 2, 3, 4])
+arr2 = np.array([5, 6, 7, 8])
+
+# 算术运算
+print("算术运算:")
+print("arr1 + arr2:", arr1 + arr2)  # [6, 8, 10, 12]
+print("arr1 * arr2:", arr1 * arr2)  # [5, 12, 21, 32]
+print("arr1 ** 2:", arr1 ** 2)       # [1, 4, 9, 16]
+
+# 比较运算
+print("\n比较运算:")
+print("arr1 > arr2:", arr1 > arr2)  # [False, False, False, False]
+print("arr1 == 2:", arr1 == 2)      # [False, True, False, False]
+
+# 统计运算
+print("\n统计运算:")
+print("sum:", arr1.sum())           # 10
+print("mean:", arr1.mean())         # 2.5
+print("std:", arr1.std())           # 1.118...
+print("max:", arr1.max())           # 4
+print("min:", arr1.min())           # 1
+print("argmax:", arr1.argmax())     # 3 (最大值的索引)
+```
+
+### **3. 形状操作**
+```python
+import numpy as np
+
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+print("原数组形状:", arr.shape)  # (2, 3)
+
+# reshape - 改变形状
+reshaped = arr.reshape(3, 2)
+print("reshape后:")
+print(reshaped)
+print("新形状:", reshaped.shape)  # (3, 2)
+
+# flatten - 展平
+flattened = arr.flatten()
+print("\n展平后:", flattened)
+print("新形状:", flattened.shape)  # (6,)
+
+# transpose - 转置
+transposed = arr.T
+print("\n转置后:")
+print(transposed)
+print("新形状:", transposed.shape)  # (3, 2)
+
+# concatenate - 连接
+arr1 = np.array([[1, 2], [3, 4]])
+arr2 = np.array([[5, 6], [7, 8]])
+concatenated = np.concatenate([arr1, arr2], axis=0)
+print("\n连接后:")
+print(concatenated)
+print("新形状:", concatenated.shape)  # (4, 2)
+```
+
+---
+
+## **🎯 NumPy 在AI测试中的应用**
+
+### **1. 模型预测结果处理**
+```python
+import numpy as np
+
+class AIModelTestResult:
+    def __init__(self):
+        self.predictions = None
+        self.true_labels = None
+    
+    def load_test_data(self, predictions_list, true_labels_list):
+        """加载测试数据"""
+        self.predictions = np.array(predictions_list)
+        self.true_labels = np.array(true_labels_list)
+        
+        print(f"加载测试数据: {len(self.predictions)} 个样本")
+        print(f"预测值范围: {self.predictions.min()} - {self.predictions.max()}")
+        print(f"真实标签: {np.unique(self.true_labels)}")
+    
+    def calculate_accuracy(self):
+        """计算准确率"""
+        correct = np.sum(self.predictions == self.true_labels)
+        total = len(self.true_labels)
+        accuracy = correct / total
+        
+        print(f"正确预测: {correct}/{total}")
+        print(f"准确率: {accuracy:.4f}")
+        
+        return accuracy
+    
+    def calculate_confusion_matrix(self):
+        """计算混淆矩阵"""
+        # 假设是二分类问题
+        classes = np.unique(np.concatenate([self.predictions, self.true_labels]))
+        n_classes = len(classes)
+        
+        confusion_matrix = np.zeros((n_classes, n_classes), dtype=int)
+        
+        for true_label, pred_label in zip(self.true_labels, self.predictions):
+            true_idx = np.where(classes == true_label)[0][0]
+            pred_idx = np.where(classes == pred_label)[0][0]
+            confusion_matrix[true_idx, pred_idx] += 1
+        
+        print("混淆矩阵:")
+        print(confusion_matrix)
+        
+        return confusion_matrix
+    
+    def analyze_prediction_distribution(self):
+        """分析预测分布"""
+        unique_preds, counts = np.unique(self.predictions, return_counts=True)
+        
+        print("\n预测分布:")
+        for pred, count in zip(unique_preds, counts):
+            percentage = count / len(self.predictions) * 100
+            print(f"预测值 {pred}: {count} 次 ({percentage:.1f}%)")
+        
+        return unique_preds, counts
+
+# 使用示例
+def test_ai_model_results():
+    # 模拟测试数据
+    predictions = [1, 0, 1, 1, 0, 1, 0, 0, 1, 1]
+    true_labels = [1, 0, 0, 1, 0, 1, 0, 1, 1, 1]
+    
+    # 创建测试结果分析器
+    analyzer = AIModelTestResult()
+    analyzer.load_test_data(predictions, true_labels)
+    
+    # 计算指标
+    accuracy = analyzer.calculate_accuracy()
+    confusion_matrix = analyzer.calculate_confusion_matrix()
+    analyzer.analyze_prediction_distribution()
+
+test_ai_model_results()
+```
+
+### **2. 性能测试数据处理**
+```python
+import numpy as np
+import time
+
+class InferencePerformanceTester:
+    def __init__(self):
+        self.latencies = []
+        self.throughputs = []
+    
+    def measure_inference_latency(self, model, test_inputs, num_runs=100):
+        """测量推理延迟"""
+        print(f"测量推理延迟 ({num_runs} 次运行)")
+        
+        latencies = []
+        
+        for i, input_data in enumerate(test_inputs):
+            start_time = time.time()
+            
+            # 模拟推理
+            _ = model.predict(input_data)
+            
+            end_time = time.time()
+            latency = end_time - start_time
+            latencies.append(latency)
+            
+            if (i + 1) % 10 == 0:
+                print(f"完成 {i + 1}/{len(test_inputs)} 次测试")
+        
+        self.latencies = np.array(latencies)
+        
+        # 统计分析
+        mean_latency = np.mean(self.latencies)
+        std_latency = np.std(self.latencies)
+        p95_latency = np.percentile(self.latencies, 95)
+        p99_latency = np.percentile(self.latencies, 99)
+        
+        print(f"\n延迟统计:")
+        print(f"平均值: {mean_latency:.4f}s")
+        print(f"标准差: {std_latency:.4f}s")
+        print(f"P95: {p95_latency:.4f}s")
+        print(f"P99: {p99_latency:.4f}s")
+        
+        return {
+            "mean": mean_latency,
+            "std": std_latency,
+            "p95": p95_latency,
+            "p99": p99_latency
+        }
+    
+    def measure_throughput(self, model, batch_sizes, num_runs=50):
+        """测量吞吐量"""
+        print("测量吞吐量")
+        
+        throughputs = []
+        
+        for batch_size in batch_sizes:
+            print(f"测试批大小: {batch_size}")
+            
+            batch_latencies = []
+            
+            for _ in range(num_runs):
+                # 创建批次数据
+                batch_input = np.random.rand(batch_size, 10)  # 假设输入是10维
+                
+                start_time = time.time()
+                
+                # 模拟批量推理
+                for _ in range(batch_size):
+                    _ = model.predict(batch_input[0])
+                
+                end_time = time.time()
+                
+                batch_latency = end_time - start_time
+                throughput = batch_size / batch_latency
+                batch_latencies.append(throughput)
+            
+            avg_throughput = np.mean(batch_latencies)
+            throughputs.append(avg_throughput)
+            
+            print(f"  平均吞吐量: {avg_throughput:.2f} samples/s")
+        
+        self.throughputs = np.array(throughputs)
+        
+        return dict(zip(batch_sizes, throughputs))
+
+# 模拟模型
+class MockModel:
+    def predict(self, input_data):
+        # 模拟推理延迟
+        time.sleep(0.01)
+        return np.random.rand(10)
+
+# 测试性能
+def test_inference_performance():
+    model = MockModel()
+    tester = InferencePerformanceTester()
+    
+    # 测试延迟
+    test_inputs = [np.random.rand(10) for _ in range(50)]
+    latency_stats = tester.measure_inference_latency(model, test_inputs)
+    
+    # 测试吞吐量
+    batch_sizes = [1, 4, 8, 16]
+    throughput_stats = tester.measure_throughput(model, batch_sizes)
+
+test_inference_performance()
+```
+
+---
+
+## **📈 NumPy 常用函数总结**
+
+### **数学函数**
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+
+# 三角函数
+print("三角函数:")
+print("sin:", np.sin(arr))
+print("cos:", np.cos(arr))
+
+# 指数和对数
+print("\n指数和对数:")
+print("exp:", np.exp(arr))
+print("log:", np.log(arr))
+print("log10:", np.log10(arr))
+
+# 取整函数
+print("\n取整函数:")
+float_arr = np.array([1.2, 2.7, 3.5, 4.9])
+print("floor:", np.floor(float_arr))  # 向下取整
+print("ceil:", np.ceil(float_arr))    # 向上取整
+print("round:", np.round(float_arr))  # 四舍五入
+```
+
+### **统计函数**
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+print("统计函数:")
+print("sum:", np.sum(arr))           # 求和
+print("mean:", np.mean(arr))         # 平均值
+print("median:", np.median(arr))     # 中位数
+print("std:", np.std(arr))           # 标准差
+print("var:", np.var(arr))           # 方差
+print("min:", np.min(arr))           # 最小值
+print("max:", np.max(arr))           # 最大值
+print("ptp:", np.ptp(arr))           # 极差 (max - min)
+
+# 分位数
+print("\n分位数:")
+print("25%分位数:", np.percentile(arr, 25))
+print("50%分位数:", np.percentile(arr, 50))
+print("75%分位数:", np.percentile(arr, 75))
+```
+
+---
+
+## **🎯 学习建议**
+
+### **1. 循序渐进**
+```python
+# 第一步：基础操作
+arr = np.array([1, 2, 3, 4, 5])
+print(arr + 1)  # 简单运算
+
+# 第二步：多维数组
+matrix = np.array([[1, 2, 3], [4, 5, 6]])
+print(matrix.shape)  # 理解形状
+
+# 第三步：实际应用
+# 在AI测试中处理数据
+```
+
+### **2. 多练习**
+```python
+# 练习1：创建不同形状的数组
+# 练习2：进行数组运算
+# 练习3：处理实际数据
+```
+
+### **3. 结合实际应用**
+```python
+# 在AI测试中，NumPy主要用于：
+# 1. 处理批量数据
+# 2. 计算性能指标
+# 3. 统计分析
+# 4. 数据预处理
+```
+
+NumPy 是Python科学计算的基础，也是AI/机器学习的核心工具。掌握NumPy对AI测试工作非常重要！
+
+
+
+
+
+
+
+
+
